@@ -1,8 +1,5 @@
 package com.leetcode;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /*
@@ -24,7 +21,9 @@ class NumDifferentIntegers{
 
         char[] s = word.toCharArray();
         Map<String,Object> map = new HashMap<>();
-        int i=0,l=0,r=0,n=s.length;
+        int l=0;
+        int r=0;
+        int n=s.length;
         while(true){
             
             while(l<n && (s[l]<'0' || s[l]>'9')){
