@@ -118,7 +118,7 @@ public class WallPaper {
 
         if (ft.exists()) {
             System.out.println(ft.getName() + "重复...." + "正在删除");
-            ft.delete();
+            Files.delete(ft.toPath());
         }
         Files.copy(fs.toPath(),ft.toPath(),StandardCopyOption.REPLACE_EXISTING);
 //        FileInputStream fi = new FileInputStream(fs);
