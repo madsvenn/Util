@@ -3,7 +3,6 @@ package com.company;
 import entity.Node;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class Main {
 
@@ -19,7 +18,7 @@ public class Main {
             head=head.next;
         }
 
-        Map<Node,Node> map = new HashMap<>();
+        new HashMap<>();
         
     }
 

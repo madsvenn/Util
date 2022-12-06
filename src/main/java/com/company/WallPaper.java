@@ -21,93 +21,94 @@ public class WallPaper {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm");
         List<String> list = Collections.synchronizedList(new ArrayList<String>());
 
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("请输入wallpaper下载的地址");
-        String str = scanner.next();
-        File sfile = new File(str);
-        System.out.println("请输入时间(格式为:年-月-日-小时-分钟)");
-        String time = scanner.next();
-        Date date = sdf.parse(time);
-        System.out.println("请输入需要存放的地址");
-        String str2 = scanner.next();
-        File tfile = new File(str2);
-        if (!tfile.exists() && !tfile.isDirectory()) {
-            tfile = new File(tfile.getParentFile(), "wallpaper下载的视频");
-            System.out.println(tfile.getAbsolutePath());
-            tfile.mkdirs();
-        }
+        try (Scanner scanner = new Scanner(System.in)) {
+            System.out.println("请输入wallpaper下载的地址");
+            String str = scanner.next();
+            File sfile = new File(str);
+            System.out.println("请输入时间(格式为:年-月-日-小时-分钟)");
+            String time = scanner.next();
+            Date date = sdf.parse(time);
+            System.out.println("请输入需要存放的地址");
+            String str2 = scanner.next();
+            File tfile = new File(str2);
+            if (!tfile.exists() && !tfile.isDirectory()) {
+                tfile = new File(tfile.getParentFile(), "wallpaper下载的视频");
+                System.out.println(tfile.getAbsolutePath());
+                tfile.mkdirs();
+            }
 
-        if (!sfile.exists() && !sfile.isDirectory()) {
-            System.out.println("地址不对哦");
-            return;
-        }
-        if (sfile.isDirectory()) {
-            File[] fs = sfile.listFiles();
-            File finalTfile = tfile;
-            int tmp = 0;
+            if (!sfile.exists() && !sfile.isDirectory()) {
+                System.out.println("地址不对哦");
+                return;
+            }
+            if (sfile.isDirectory()) {
+                File[] fs = sfile.listFiles();
+                File finalTfile = tfile;
+                int tmp = 0;
 
-            assert fs != null;
-            /**
-             * *先统计文件的个数
-             */
+                assert fs != null;
+                /**
+                 * *先统计文件的个数
+                 */
 
-            for (File x : fs) {
-                Date date1 = new Date(x.lastModified());
-                if (date1.compareTo(date) > 0) {
-                    boolean flag = false;
-                    String needFilename = x.getAbsolutePath() + "\\project.json";
-                    if (new File(needFilename).exists()) {
-                        flag = isNeedFile(needFilename);
-                    }
-                    if (flag) {
-                        tmp++;
+                for (File x : fs) {
+                    Date date1 = new Date(x.lastModified());
+                    if (date1.compareTo(date) > 0) {
+                        boolean flag = false;
+                        String needFilename = x.getAbsolutePath() + "\\project.json";
+                        if (new File(needFilename).exists()) {
+                            flag = isNeedFile(needFilename);
+                        }
+                        if (flag) {
+                            tmp++;
+                        }
                     }
                 }
-            }
 
-            CountDownLatch cdl = new CountDownLatch(tmp);
-            /**
-             *多线程进行复制
-             */
-            Date startDate = new Date();
-            for (File x : fs) {
-                executor.submit(
-                        () -> {
-                            Date date1 = new Date(x.lastModified());
-                            if (date1.compareTo(date) > 0) {
-                                boolean flag = false;
-                                String needFilename = x.getAbsolutePath() + "\\project.json";
-                                if (new File(needFilename).exists()) {
-                                    flag = isNeedFile(needFilename);
-                                }
-                                if (flag) {
-                                    String filename = x.getAbsolutePath() + "\\" + Filename(needFilename);
-                                    File tf = new File(finalTfile.getAbsoluteFile() + "\\" + Filename(needFilename));
-                                    try {
-                                        copyfile(new File(filename), tf);
-                                        synchronized (list){
-                                            list.add("成功");
-                                        }
-                                        System.out.println("将 " + Filename(needFilename) + "  复制到 " + finalTfile.getAbsolutePath() + " 中");
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                        System.out.println(Filename(needFilename) + "复制失败");
+                CountDownLatch cdl = new CountDownLatch(tmp);
+                /**
+                 *多线程进行复制
+                 */
+                Date startDate = new Date();
+                for (File x : fs) {
+                    executor.submit(
+                            () -> {
+                                Date date1 = new Date(x.lastModified());
+                                if (date1.compareTo(date) > 0) {
+                                    boolean flag = false;
+                                    String needFilename = x.getAbsolutePath() + "\\project.json";
+                                    if (new File(needFilename).exists()) {
+                                        flag = isNeedFile(needFilename);
                                     }
+                                    if (flag) {
+                                        String filename = x.getAbsolutePath() + "\\" + Filename(needFilename);
+                                        File tf = new File(finalTfile.getAbsoluteFile() + "\\" + Filename(needFilename));
+                                        try {
+                                            copyfile(new File(filename), tf);
+                                            synchronized (list){
+                                                list.add("成功");
+                                            }
+                                            System.out.println("将 " + Filename(needFilename) + "  复制到 " + finalTfile.getAbsolutePath() + " 中");
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                            System.out.println(Filename(needFilename) + "复制失败");
+                                        }
 
-                                    cdl.countDown();
+                                        cdl.countDown();
+                                    }
                                 }
-                            }
-                        });
-            }
+                            });
+                }
 
-            cdl.await();
-            executor.shutdown();
-            System.out.println("复制完成，共" + list.size() + "个文件");
-            Date endDate = new Date();
-            System.out.println(endDate.getTime()-startDate.getTime());
-        }
-        else {
-            System.out.println("地址不对哦");
+                cdl.await();
+                executor.shutdown();
+                System.out.println("复制完成，共" + list.size() + "个文件");
+                Date endDate = new Date();
+                System.out.println(endDate.getTime()-startDate.getTime());
+            }
+            else {
+                System.out.println("地址不对哦");
+            }
         }
 
     }

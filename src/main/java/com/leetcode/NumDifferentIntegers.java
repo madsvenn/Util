@@ -23,7 +23,6 @@ class NumDifferentIntegers{
     public static int numDifferentIntegers(String word) {
 
         char[] s = word.toCharArray();
-        StringBuffer sb = new StringBuffer();
         Map<String,Object> map = new HashMap<>();
         int i=0,l=0,r=0,n=s.length;
         while(true){
