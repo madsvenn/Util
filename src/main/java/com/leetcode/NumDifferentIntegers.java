@@ -1,4 +1,4 @@
-package com;
+package com.leetcode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
