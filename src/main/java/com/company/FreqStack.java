@@ -12,5 +12,6 @@ public class FreqStack {
         List<Integer> list = new ArrayList<>();
         list.add(1);
         System.out.println(list.contains(1));
+
     }
 }
